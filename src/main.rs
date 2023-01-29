@@ -1,21 +1,22 @@
 use regex::Regex;
+use std::env::args;
 use std::fs::{read_dir, File, ReadDir};
 use std::io::{Read, Result};
 use std::path::{Path, PathBuf};
 
-fn get_files(dir: &Path) -> Vec<String> {
+fn get_files(dir: &Path, root_alias: &String) -> Vec<String> {
     let dir_entries: ReadDir = read_dir(dir).unwrap();
     let mut paths: Vec<String> = vec![];
     dir_entries.for_each(|dir| {
         let path_buf: PathBuf = dir.unwrap().path();
         if path_buf.is_dir() {
-            get_files(path_buf.as_path())
+            get_files(path_buf.as_path(), root_alias)
                 .iter()
                 .for_each(|str| paths.push(String::from(str)));
         } else {
             let str_path = path_buf.to_str().unwrap();
             if str_path.ends_with(".js") {
-                paths.push(String::from(str_path).replace("./", ""));
+                paths.push(String::from(str_path).replace("./", root_alias));
             }
         }
     });
@@ -44,7 +45,8 @@ fn get_file_imports(path: &String) -> Vec<String> {
 }
 
 fn main() -> Result<()> {
-    let files = get_files(Path::new("."));
+    let root_alias = args().nth(0).unwrap_or(String::from(""));
+    let files = get_files(Path::new("."), &root_alias);
     let imports = files.iter().map(|str| get_file_imports(str)).flatten();
     files.iter().for_each(|file| {
         if imports.clone().find(|import| import == file) == None {
