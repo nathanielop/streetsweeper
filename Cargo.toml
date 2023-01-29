@@ -1,0 +1,12 @@
+[package]
+name = "streetsweeper"
+authors=["Nathaniel Pendy <n@thaniel.dev>"]
+license="MIT"
+repository = "https://github.com/nathanielop/streetsweeper"
+keywords = ["cli", "utilities"]
+categories = ["command-line-utilities"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+regex = "1"
